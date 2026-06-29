@@ -541,9 +541,15 @@
       const param = new URLSearchParams(location.search).get("backend");
       if (param) return param.replace(/\/$/, "");
       const saved = localStorage.getItem("azArenaBackend");
-      if (saved) return saved.replace(/\/$/, "");
+      if (saved) {
+        const normalized = saved.replace(/\/$/, "");
+        const isPages = location.hostname.includes("github.io");
+        const isLoopback = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i.test(normalized);
+        if (!isPages || !isLoopback) return normalized;
+        localStorage.removeItem("azArenaBackend");
+      }
       if (location.protocol.startsWith("http") && !location.hostname.includes("github.io")) return location.origin;
-      return "http://127.0.0.1:8011";
+      return "https://desktop-ka0eh6i.tail12aa6b.ts.net/chess-arena";
     }
 
     function backendUrl() {
@@ -553,7 +559,8 @@
     function wsUrl(path) {
       const u = new URL(backendUrl());
       u.protocol = u.protocol === "https:" ? "wss:" : "ws:";
-      u.pathname = path;
+      const basePath = u.pathname.replace(/\/$/, "");
+      u.pathname = `${basePath}${path}`;
       u.search = "";
       return u.toString();
     }
