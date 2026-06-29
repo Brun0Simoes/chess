@@ -417,16 +417,20 @@
       border-top-color: var(--accent);
       animation: spin .8s linear infinite;
     }
-    .pages-frame {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      border: 0;
-      background: var(--bg);
-    }
     .pages-proxy .app {
       display: none;
+    }
+    .pages-redirect {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--text);
+    }
+    .pages-redirect p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     @media (max-width: 1050px) {
@@ -453,11 +457,12 @@
     window.__AZ_PAGES_PROXY__ = location.hostname.includes("github.io");
     if (window.__AZ_PAGES_PROXY__) {
       document.body.classList.add("pages-proxy");
-      const frame = document.createElement("iframe");
-      frame.className = "pages-frame";
-      frame.src = "https://desktop-ka0eh6i.tail12aa6b.ts.net/chess-arena/";
-      frame.title = "AlphaZero Arena";
-      document.body.appendChild(frame);
+      const target = "https://desktop-ka0eh6i.tail12aa6b.ts.net/chess-arena/";
+      const notice = document.createElement("div");
+      notice.className = "pages-redirect";
+      notice.innerHTML = `<p>Abrindo AlphaZero Arena...</p>`;
+      document.body.appendChild(notice);
+      location.replace(target);
     }
   </script>
   <main class="app">
