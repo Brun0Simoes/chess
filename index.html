@@ -558,6 +558,10 @@
       return u.toString();
     }
 
+    function localFetchOptions() {
+      return { cache: "no-store", targetAddressSpace: "local" };
+    }
+
     function setServer(ok, text) {
       $("serverDot").className = "status-dot " + (ok ? "ok" : "bad");
       $("serverStatus").textContent = text;
@@ -762,7 +766,7 @@
 
     async function refreshHealth() {
       try {
-        const res = await fetch(backendUrl() + "/health", {cache:"no-store"});
+        const res = await fetch(backendUrl() + "/health", localFetchOptions());
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const health = await res.json();
         $("device").textContent = health.device || "-";
@@ -776,7 +780,7 @@
     }
 
     async function loadModels() {
-      const res = await fetch(backendUrl() + "/models", {cache:"no-store"});
+      const res = await fetch(backendUrl() + "/models", localFetchOptions());
       if (!res.ok) throw new Error(`models HTTP ${res.status}`);
       models = await res.json();
       modelById = Object.fromEntries(models.map(m => [m.id, m]));
