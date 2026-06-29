@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AlphaZero Arena</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #091117;
+      --panel: #101a22;
+      --panel-2: #0d171f;
+      --line: #24313b;
+      --line-soft: #1a2730;
+      --text: #edf5f7;
+      --muted: #8ea0aa;
+      --accent: #2f81f7;
+      --accent-2: #37c56b;
+      --danger: #ef4e4e;
+      --warn: #d8a441;
+      --light: #d9b981;
+      --dark: #90613a;
+      --last: #f0c66b;
+      --hint: #68c676;
+      --shadow: 0 18px 60px rgba(0, 0, 0, .35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(47, 129, 247, .12), transparent 34rem),
+        linear-gradient(180deg, #081016 0%, #0a1218 46%, #070c11 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+    button, input, select {
+      font: inherit;
+      letter-spacing: 0;
+    }
+    .app {
+      width: min(1520px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 18px 0 22px;
+    }
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(210px, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 4px 2px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .mark {
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(47,129,247,.5);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #7bb3ff;
+      background: linear-gradient(145deg, rgba(47,129,247,.18), rgba(11,22,30,.4));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+      flex: 0 0 auto;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.05;
+      font-weight: 760;
+    }
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .server-strip {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .metric { min-width: 92px; }
+    .metric .label {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    .metric .value {
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .status-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 6px;
+      background: var(--warn);
+      box-shadow: 0 0 16px rgba(216,164,65,.4);
+    }
+    .status-dot.ok { background: var(--accent-2); box-shadow: 0 0 16px rgba(55,197,107,.4); }
+    .status-dot.bad { background: var(--danger); box-shadow: 0 0 16px rgba(239,78,78,.4); }
+    .btn {
+      border: 1px solid var(--line);
+      background: #14212b;
+      color: var(--text);
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn:hover { background: #192a36; border-color: #345063; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+    .btn.danger { background: var(--danger); border-color: var(--danger); color: white; }
+    .btn.ghost { background: transparent; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(460px, 760px) minmax(380px, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .panel {
+      background: rgba(16, 26, 34, .86);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .board-panel { padding: 12px; min-width: 0; }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 0 0 12px;
+    }
+    .board-wrap { display: grid; gap: 10px; }
+    #board {
+      width: min(100%, 736px);
+      aspect-ratio: 1;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      overflow: hidden;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+      background: #111;
+    }
+    .sq {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      min-height: 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .sq.light { background: linear-gradient(135deg, #e4c994, var(--light)); }
+    .sq.dark { background: linear-gradient(135deg, #a97443, var(--dark)); }
+    .sq.selected { box-shadow: inset 0 0 0 4px #f6da67; }
+    .sq.last { box-shadow: inset 0 0 0 4px rgba(240,198,107,.95); }
+    .sq.check { box-shadow: inset 0 0 0 4px rgba(239,78,78,.95); }
+    .piece {
+      font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", serif;
+      font-size: clamp(34px, 6vw, 64px);
+      line-height: 1;
+      filter: drop-shadow(0 2px 1px rgba(0,0,0,.65));
+      transform: translateY(-1px);
+    }
+    .piece.white { color: #fff8e8; text-shadow: 0 0 1px #141414, 0 2px 2px rgba(0,0,0,.65); }
+    .piece.black { color: #13171a; text-shadow: 0 0 1px rgba(255,255,255,.7), 0 2px 2px rgba(0,0,0,.5); }
+    .coord {
+      position: absolute;
+      font-size: 11px;
+      color: rgba(20,22,24,.62);
+      font-weight: 700;
+      pointer-events: none;
+    }
+    .coord.file { right: 5px; bottom: 3px; }
+    .coord.rank { left: 5px; top: 3px; }
+    .hint {
+      position: absolute;
+      width: 24%;
+      aspect-ratio: 1;
+      border-radius: 999px;
+      background: rgba(54, 160, 71, .48);
+      pointer-events: none;
+    }
+    .capture {
+      position: absolute;
+      inset: 8%;
+      border: 5px solid rgba(54, 160, 71, .48);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .right { display: grid; gap: 10px; }
+    .section {
+      padding: 14px;
+      background: rgba(13, 23, 31, .78);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .section-title h2 { margin: 0; font-size: 15px; font-weight: 720; }
+    .side-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: white;
+      display: inline-block;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .side-dot.black { background: #050606; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 128px;
+      gap: 10px;
+      align-items: end;
+    }
+    .field label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .field input, .field select {
+      width: 100%;
+      height: 38px;
+      border: 1px solid var(--line);
+      background: #0c161e;
+      color: var(--text);
+      border-radius: 7px;
+      padding: 0 10px;
+      outline: none;
+    }
+    .field input:focus, .field select:focus {
+      border-color: #4776a3;
+      box-shadow: 0 0 0 3px rgba(47,129,247,.16);
+    }
+    .match-state {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+    }
+    .state-cell { background: #0d171f; padding: 12px; min-height: 68px; }
+    .state-cell span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 6px;
+    }
+    .state-cell strong {
+      font-size: 14px;
+      font-weight: 680;
+      overflow-wrap: anywhere;
+    }
+    .bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .history { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .history th {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 650;
+      text-align: left;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .history td {
+      padding: 8px;
+      border-bottom: 1px solid var(--line-soft);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .history-wrap {
+      max-height: 252px;
+      overflow: auto;
+      border: 1px solid var(--line-soft);
+      border-radius: 7px;
+      background: #0a1218;
+    }
+    .connection-grid { display: grid; gap: 8px; }
+    .url-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .log {
+      min-height: 19px;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+    .log.error { color: #ff8f8f; }
+    .thinking { display: inline-flex; align-items: center; gap: 8px; }
+    .spin {
+      width: 13px;
+      height: 13px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.18);
+      border-top-color: var(--accent);
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 1050px) {
+      .topbar { grid-template-columns: 1fr; }
+      .server-strip { justify-content: flex-start; }
+      .layout { grid-template-columns: 1fr; }
+      #board { margin: 0 auto; }
+      .bottom { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .app { width: min(100vw - 14px, 1520px); padding-top: 10px; }
+      .topbar { gap: 10px; }
+      .server-strip { gap: 10px; }
+      .toolbar { display: grid; grid-template-columns: 1fr 1fr; }
+      .toolbar .btn { width: 100%; }
+      .grid { grid-template-columns: 1fr; }
+      .match-state { grid-template-columns: 1fr 1fr; }
+      .piece { font-size: clamp(28px, 10vw, 46px); }
+      .coord { font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2 21 7v10l-9 5-9-5V7l9-5Z" stroke="currentColor" stroke-width="1.7"/>
+            <path d="m8 9 4-2 4 2v6l-4 2-4-2V9Z" stroke="currentColor" stroke-width="1.7"/>
+          </svg>
+        </div>
+        <div>
+          <h1>AlphaZero Arena</h1>
+          <p>Humano vs modelo, modelo vs modelo, com sims por lado.</p>
+        </div>
+      </div>
+      <div class="server-strip">
+        <div class="metric"><span class="label">Servidor</span><span class="value"><i id="serverDot" class="status-dot"></i><b id="serverStatus">offline</b></span></div>
+        <div class="metric"><span class="label">Dispositivo</span><span class="value" id="device">-</span></div>
+        <div class="metric"><span class="label">Uptime</span><span class="value" id="uptime">-</span></div>
+        <div class="metric"><span class="label">Cache</span><span class="value" id="cache">-</span></div>
+        <button id="reconnect" class="btn ghost" type="button">Reconectar</button>
+      </div>
+    </header>
+
+    <section class="layout">
+      <div class="panel board-panel">
+        <div class="toolbar">
+          <button id="newGame" class="btn primary" type="button">Novo jogo</button>
+          <button id="stop" class="btn danger" type="button">Parar</button>
+          <button id="flip" class="btn" type="button">Virar tabuleiro</button>
+          <button id="presetHumanModel" class="btn" type="button">Humano vs modelo</button>
+          <button id="presetModelModel" class="btn" type="button">Modelo vs modelo</button>
+        </div>
+        <div class="board-wrap">
+          <div id="board" aria-label="Tabuleiro de xadrez"></div>
+          <div id="boardLog" class="log"></div>
+        </div>
+      </div>
+
+      <aside class="right">
+        <div class="section">
+          <div class="section-title"><h2><span class="side-dot"></span>Brancas</h2><span id="whiteRole">Humano</span></div>
+          <div class="grid">
+            <div class="field"><label for="whitePlayer">Jogador</label><select id="whitePlayer"></select></div>
+            <div class="field"><label for="whiteSims">Sims</label><input id="whiteSims" type="number" min="1" max="1600" step="1" value="96"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><h2><span class="side-dot black"></span>Pretas</h2><span id="blackRole">Modelo</span></div>
+          <div class="grid">
+            <div class="field"><label for="blackPlayer">Jogador</label><select id="blackPlayer"></select></div>
+            <div class="field"><label for="blackSims">Sims</label><input id="blackSims" type="number" min="1" max="1600" step="1" value="96"></div>
+          </div>
+        </div>
+
+        <div class="match-state">
+          <div class="state-cell"><span>Status</span><strong id="gameStatus">-</strong></div>
+          <div class="state-cell"><span>Vez</span><strong id="turn">-</strong></div>
+          <div class="state-cell"><span>Pensando</span><strong id="thinking">-</strong></div>
+          <div class="state-cell"><span>Ultimo lance</span><strong id="lastMove">-</strong></div>
+        </div>
+
+        <div class="bottom">
+          <div class="section">
+            <div class="section-title"><h2>Historico</h2><button id="clearLog" class="btn ghost" type="button">Limpar aviso</button></div>
+            <div class="history-wrap">
+              <table class="history">
+                <thead><tr><th>#</th><th>Brancas</th><th>Pretas</th></tr></thead>
+                <tbody id="history"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-title"><h2>Conexao com backend</h2><button id="saveBackend" class="btn" type="button">Salvar</button></div>
+            <div class="connection-grid">
+              <div class="field">
+                <label for="backendUrl">URL do servidor Docker</label>
+                <div class="url-row">
+                  <input id="backendUrl" type="url" spellcheck="false">
+                  <button id="copyBackend" class="btn" type="button">Copiar</button>
+                </div>
+              </div>
+              <div class="match-state">
+                <div class="state-cell"><span>API</span><strong id="apiVersion">-</strong></div>
+                <div class="state-cell"><span>Modelos</span><strong id="modelCount">-</strong></div>
+              </div>
+              <div class="log" id="connLog"></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const FILES = "abcdefgh";
+    const PIECES = {K:"&#9812;",Q:"&#9813;",R:"&#9814;",B:"&#9815;",N:"&#9816;",P:"&#9817;",k:"&#9818;",q:"&#9819;",r:"&#9820;",b:"&#9821;",n:"&#9822;",p:"&#9823;"};
+    const $ = (id) => document.getElementById(id);
+    let ws = null;
+    let state = null;
+    let models = [];
+    let modelById = {};
+    let selected = null;
+    let legalDests = [];
+    let pieces = {};
+    let flipped = false;
+
+    function defaultBackend() {
+      const param = new URLSearchParams(location.search).get("backend");
+      if (param) return param.replace(/\/$/, "");
+      const saved = localStorage.getItem("azArenaBackend");
+      if (saved) return saved.replace(/\/$/, "");
+      if (location.protocol.startsWith("http") && !location.hostname.includes("github.io")) return location.origin;
+      return "http://127.0.0.1:8011";
+    }
+
+    function backendUrl() {
+      return $("backendUrl").value.trim().replace(/\/$/, "");
+    }
+
+    function wsUrl(path) {
+      const u = new URL(backendUrl());
+      u.protocol = u.protocol === "https:" ? "wss:" : "ws:";
+      u.pathname = path;
+      u.search = "";
+      return u.toString();
+    }
+
+    function setServer(ok, text) {
+      $("serverDot").className = "status-dot " + (ok ? "ok" : "bad");
+      $("serverStatus").textContent = text;
+    }
+
+    function log(msg, error=false) {
+      $("boardLog").textContent = msg || "";
+      $("boardLog").className = "log" + (error ? " error" : "");
+    }
+
+    function parseFen(fen) {
+      const out = {};
+      const rows = fen.split(" ")[0].split("/");
+      for (let r = 0; r < 8; r++) {
+        let f = 0;
+        for (const ch of rows[r]) {
+          if (/\d/.test(ch)) f += Number(ch);
+          else {
+            out[FILES[f] + (8 - r)] = ch;
+            f++;
+          }
+        }
+      }
+      return out;
+    }
+
+    function currentPlayer() {
+      if (!state) return "human";
+      return state.turn === "w" ? state.players.white : state.players.black;
+    }
+
+    function playerLabel(id) {
+      if (id === "human") return "Humano";
+      return modelById[id]?.label || id;
+    }
+
+    function ownPieceAt(square) {
+      const p = pieces[square];
+      if (!p || !state) return false;
+      return state.turn === "w" ? p === p.toUpperCase() : p === p.toLowerCase();
+    }
+
+    function humanToMove() {
+      return state && !state.over && !state.thinking && currentPlayer() === "human";
+    }
+
+    function renderBoard() {
+      if (!state) return;
+      pieces = parseFen(state.fen);
+      const board = $("board");
+      board.innerHTML = "";
+      const last = state.lastMove ? [state.lastMove.slice(0, 2), state.lastMove.slice(2, 4)] : [];
+      let checkSquare = null;
+      if (state.check) {
+        const king = state.turn === "w" ? "K" : "k";
+        for (const sq in pieces) if (pieces[sq] === king) checkSquare = sq;
+      }
+      for (let dr = 0; dr < 8; dr++) {
+        for (let dc = 0; dc < 8; dc++) {
+          const rank = flipped ? dr + 1 : 8 - dr;
+          const file = flipped ? 7 - dc : dc;
+          const square = FILES[file] + rank;
+          const cell = document.createElement("button");
+          cell.type = "button";
+          cell.className = "sq " + (((file + rank) % 2 === 0) ? "light" : "dark");
+          cell.dataset.square = square;
+          cell.setAttribute("aria-label", square);
+          if (selected === square) cell.classList.add("selected");
+          else if (last.includes(square)) cell.classList.add("last");
+          if (checkSquare === square) cell.classList.add("check");
+          const p = pieces[square];
+          if (p) {
+            const piece = document.createElement("span");
+            piece.className = "piece " + (p === p.toUpperCase() ? "white" : "black");
+            piece.innerHTML = PIECES[p];
+            cell.appendChild(piece);
+          }
+          if (legalDests.includes(square)) {
+            const hint = document.createElement("span");
+            hint.className = p ? "capture" : "hint";
+            cell.appendChild(hint);
+          }
+          if (dc === 0) {
+            const c = document.createElement("span");
+            c.className = "coord rank";
+            c.textContent = rank;
+            cell.appendChild(c);
+          }
+          if (dr === 7) {
+            const c = document.createElement("span");
+            c.className = "coord file";
+            c.textContent = FILES[file];
+            cell.appendChild(c);
+          }
+          cell.onclick = () => onSquare(square);
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function renderState() {
+      if (!state) return;
+      renderBoard();
+      $("gameStatus").textContent = state.over && state.result ? `${state.status} (${state.result})` : state.status;
+      $("turn").textContent = state.turn === "w" ? "Brancas" : "Pretas";
+      $("thinking").innerHTML = state.thinking ? `<span class="thinking"><span class="spin"></span>${state.thinking === "white" ? "Brancas" : "Pretas"}</span>` : "-";
+      $("lastMove").textContent = state.lastMove || "-";
+      $("whiteRole").textContent = playerLabel(state.players.white);
+      $("blackRole").textContent = playerLabel(state.players.black);
+      renderHistory();
+      if (state.lastInfo && state.lastInfo.model !== "human") {
+        $("connLog").textContent = `${state.lastInfo.label}: ${state.lastInfo.sims} sims em ${state.lastInfo.elapsedMs} ms (${state.lastInfo.device})`;
+      }
+    }
+
+    function renderHistory() {
+      const body = $("history");
+      body.innerHTML = "";
+      if (!state || !state.history.length) return;
+      const grouped = [];
+      for (const m of state.history) {
+        const idx = m.moveNo - 1;
+        grouped[idx] ||= {no:m.moveNo, w:"", b:""};
+        grouped[idx][m.side] = `${m.san} (${m.uci})`;
+      }
+      for (const row of grouped) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${row.no}</td><td>${row.w || ""}</td><td>${row.b || ""}</td>`;
+        body.appendChild(tr);
+      }
+    }
+
+    function onSquare(square) {
+      if (!humanToMove()) return;
+      if (selected) {
+        if (legalDests.includes(square)) {
+          move(selected, square);
+          selected = null;
+          legalDests = [];
+          return;
+        }
+        if (ownPieceAt(square)) {
+          selectSquare(square);
+          return;
+        }
+        selected = null;
+        legalDests = [];
+        renderBoard();
+        return;
+      }
+      if (ownPieceAt(square)) selectSquare(square);
+    }
+
+    function selectSquare(square) {
+      selected = square;
+      legalDests = [];
+      renderBoard();
+      send({cmd:"legal", square});
+    }
+
+    function move(from, to) {
+      const piece = pieces[from];
+      const rank = Number(to[1]);
+      let uci = from + to;
+      if (piece && piece.toLowerCase() === "p" && (rank === 1 || rank === 8)) uci += "q";
+      send({cmd:"move", uci});
+    }
+
+    function send(msg) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log("WebSocket desconectado. Confira a URL do backend.", true);
+        return;
+      }
+      ws.send(JSON.stringify(msg));
+    }
+
+    function connectWs() {
+      if (ws) ws.close();
+      ws = new WebSocket(wsUrl("/ws/board"));
+      ws.onopen = () => { setServer(true, "online"); log(""); };
+      ws.onclose = () => { setServer(false, "offline"); log("Conexao encerrada.", true); };
+      ws.onerror = () => { setServer(false, "erro"); log("Falha no WebSocket. Verifique backend, HTTPS e CORS.", true); };
+      ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.type === "state") {
+          state = msg;
+          if (!humanToMove()) {
+            selected = null;
+            legalDests = [];
+          }
+          renderState();
+        } else if (msg.type === "legal") {
+          if (msg.square === selected) {
+            legalDests = msg.dests || [];
+            renderBoard();
+          }
+        } else if (msg.type === "error") {
+          log(msg.msg, true);
+        }
+      };
+    }
+
+    async function refreshHealth() {
+      try {
+        const res = await fetch(backendUrl() + "/health", {cache:"no-store"});
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const health = await res.json();
+        $("device").textContent = health.device || "-";
+        $("uptime").textContent = `${health.uptimeSec || 0}s`;
+        $("cache").textContent = `${(health.cache || []).length}/${(health.models || []).length}`;
+        $("apiVersion").textContent = health.version || "-";
+        setServer(true, "online");
+      } catch (err) {
+        setServer(false, "offline");
+        $("connLog").textContent = `Health falhou: ${err.message}`;
+      }
+    }
+
+    async function loadModels() {
+      const res = await fetch(backendUrl() + "/models", {cache:"no-store"});
+      if (!res.ok) throw new Error(`models HTTP ${res.status}`);
+      models = await res.json();
+      modelById = Object.fromEntries(models.map(m => [m.id, m]));
+      $("modelCount").textContent = String(models.length);
+      for (const id of ["whitePlayer", "blackPlayer"]) {
+        const select = $(id);
+        select.innerHTML = "";
+        const human = document.createElement("option");
+        human.value = "human";
+        human.textContent = "Humano";
+        select.appendChild(human);
+        for (const model of models) {
+          const opt = document.createElement("option");
+          opt.value = model.id;
+          opt.textContent = `${model.label} (${model.sizeMb} MB)`;
+          select.appendChild(opt);
+        }
+      }
+      $("whitePlayer").value = "human";
+      $("blackPlayer").value = models[0]?.id || "human";
+      $("whiteSims").value = models[0]?.defaultSims || 96;
+      $("blackSims").value = models[0]?.defaultSims || 96;
+      updateDisabledSims();
+    }
+
+    function updateDisabledSims() {
+      $("whiteSims").disabled = $("whitePlayer").value === "human";
+      $("blackSims").disabled = $("blackPlayer").value === "human";
+      $("whiteRole").textContent = playerLabel($("whitePlayer").value);
+      $("blackRole").textContent = playerLabel($("blackPlayer").value);
+    }
+
+    async function reconnectAll() {
+      localStorage.setItem("azArenaBackend", backendUrl());
+      try {
+        await refreshHealth();
+        await loadModels();
+        connectWs();
+      } catch (err) {
+        setServer(false, "erro");
+        log(`Falha ao conectar: ${err.message}`, true);
+      }
+    }
+
+    function newGame() {
+      selected = null;
+      legalDests = [];
+      log("");
+      send({
+        cmd: "new",
+        white: $("whitePlayer").value,
+        black: $("blackPlayer").value,
+        whiteSims: Number($("whiteSims").value || 96),
+        blackSims: Number($("blackSims").value || 96)
+      });
+    }
+
+    $("backendUrl").value = defaultBackend();
+    $("saveBackend").onclick = reconnectAll;
+    $("reconnect").onclick = reconnectAll;
+    $("copyBackend").onclick = async () => {
+      await navigator.clipboard.writeText(backendUrl());
+      $("connLog").textContent = "URL copiada.";
+    };
+    $("newGame").onclick = newGame;
+    $("stop").onclick = () => send({cmd:"stop"});
+    $("flip").onclick = () => { flipped = !flipped; renderBoard(); };
+    $("clearLog").onclick = () => log("");
+    $("whitePlayer").onchange = updateDisabledSims;
+    $("blackPlayer").onchange = updateDisabledSims;
+    $("presetHumanModel").onclick = () => {
+      $("whitePlayer").value = "human";
+      $("blackPlayer").value = models[0]?.id || "human";
+      updateDisabledSims();
+      newGame();
+    };
+    $("presetModelModel").onclick = () => {
+      $("whitePlayer").value = models[0]?.id || "human";
+      $("blackPlayer").value = models[1]?.id || models[0]?.id || "human";
+      updateDisabledSims();
+      newGame();
+    };
+    setInterval(refreshHealth, 5000);
+    reconnectAll();
+  </script>
+</body>
+</html>
