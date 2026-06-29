@@ -417,6 +417,17 @@
       border-top-color: var(--accent);
       animation: spin .8s linear infinite;
     }
+    .pages-frame {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      border: 0;
+      background: var(--bg);
+    }
+    .pages-proxy .app {
+      display: none;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
     @media (max-width: 1050px) {
       .topbar { grid-template-columns: 1fr; }
@@ -438,6 +449,17 @@
   </style>
 </head>
 <body>
+  <script>
+    window.__AZ_PAGES_PROXY__ = location.hostname.includes("github.io");
+    if (window.__AZ_PAGES_PROXY__) {
+      document.body.classList.add("pages-proxy");
+      const frame = document.createElement("iframe");
+      frame.className = "pages-frame";
+      frame.src = "https://desktop-ka0eh6i.tail12aa6b.ts.net/chess-arena/";
+      frame.title = "AlphaZero Arena";
+      document.body.appendChild(frame);
+    }
+  </script>
   <main class="app">
     <header class="topbar">
       <div class="brand">
@@ -522,6 +544,7 @@
   </main>
 
   <script>
+  if (!window.__AZ_PAGES_PROXY__) {
     const FILES = "abcdefgh";
     const PIECES = {K:"&#9812;",Q:"&#9813;",R:"&#9814;",B:"&#9815;",N:"&#9816;",P:"&#9817;",k:"&#9818;",q:"&#9819;",r:"&#9820;",b:"&#9821;",n:"&#9822;",p:"&#9823;"};
     const MIN_SIMS = 1;
@@ -548,7 +571,11 @@
         if (!isPages || !isLoopback) return normalized;
         localStorage.removeItem("azArenaBackend");
       }
-      if (location.protocol.startsWith("http") && !location.hostname.includes("github.io")) return location.origin;
+      if (location.protocol.startsWith("http") && !location.hostname.includes("github.io")) {
+        const basePath = location.pathname.replace(/\/$/, "");
+        if (basePath && basePath !== "/") return `${location.origin}${basePath}`;
+        return location.origin;
+      }
       return "https://desktop-ka0eh6i.tail12aa6b.ts.net/chess-arena";
     }
 
@@ -885,6 +912,7 @@
     };
     setInterval(refreshHealth, 5000);
     reconnectAll();
+  }
   </script>
 </body>
 </html>
