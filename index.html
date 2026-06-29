@@ -88,7 +88,9 @@
       justify-content: flex-end;
       flex-wrap: wrap;
     }
-    .metric { min-width: 92px; }
+    .metric {
+      min-width: 92px;
+    }
     .metric .label {
       display: block;
       color: var(--muted);
@@ -142,7 +144,10 @@
       border-radius: 8px;
       box-shadow: var(--shadow);
     }
-    .board-panel { padding: 12px; min-width: 0; }
+    .board-panel {
+      padding: 12px;
+      min-width: 0;
+    }
     .toolbar {
       display: flex;
       align-items: center;
@@ -150,7 +155,10 @@
       flex-wrap: wrap;
       padding: 0 0 12px;
     }
-    .board-wrap { display: grid; gap: 10px; }
+    .board-wrap {
+      display: grid;
+      gap: 10px;
+    }
     #board {
       width: min(100%, 736px);
       aspect-ratio: 1;
@@ -211,7 +219,10 @@
       border-radius: 50%;
       pointer-events: none;
     }
-    .right { display: grid; gap: 10px; }
+    .right {
+      display: grid;
+      gap: 10px;
+    }
     .section {
       padding: 14px;
       background: rgba(13, 23, 31, .78);
@@ -225,7 +236,11 @@
       gap: 10px;
       margin-bottom: 12px;
     }
-    .section-title h2 { margin: 0; font-size: 15px; font-weight: 720; }
+    .section-title h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 720;
+    }
     .side-dot {
       width: 22px;
       height: 22px;
@@ -263,6 +278,73 @@
       border-color: #4776a3;
       box-shadow: 0 0 0 3px rgba(47,129,247,.16);
     }
+    .range-field {
+      display: grid;
+      gap: 8px;
+    }
+    .range-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .range-header label {
+      margin: 0;
+    }
+    .range-header output {
+      min-width: 48px;
+      height: 24px;
+      border-radius: 6px;
+      background: #14212b;
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 720;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+    }
+    input[type="range"] {
+      appearance: none;
+      height: 38px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), #37c56b);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      margin-top: -7px;
+      border-radius: 50%;
+      background: #f8fbff;
+      border: 2px solid #7bb3ff;
+      box-shadow: 0 4px 14px rgba(0,0,0,.35);
+    }
+    input[type="range"]::-moz-range-track {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), #37c56b);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #f8fbff;
+      border: 2px solid #7bb3ff;
+    }
+    input[type="range"]:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
     .match-state {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -272,7 +354,11 @@
       border-radius: 8px;
       background: var(--line);
     }
-    .state-cell { background: #0d171f; padding: 12px; min-height: 68px; }
+    .state-cell {
+      background: #0d171f;
+      padding: 12px;
+      min-height: 68px;
+    }
     .state-cell span {
       display: block;
       color: var(--muted);
@@ -284,8 +370,12 @@
       font-weight: 680;
       overflow-wrap: anywhere;
     }
-    .bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .history { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .bottom { display: grid; gap: 10px; }
+    .history {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
     .history th {
       color: var(--muted);
       font-size: 11px;
@@ -306,8 +396,6 @@
       border-radius: 7px;
       background: #0a1218;
     }
-    .connection-grid { display: grid; gap: 8px; }
-    .url-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
     .log {
       min-height: 19px;
       color: var(--muted);
@@ -316,7 +404,11 @@
       overflow-wrap: anywhere;
     }
     .log.error { color: #ff8f8f; }
-    .thinking { display: inline-flex; align-items: center; gap: 8px; }
+    .thinking {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
     .spin {
       width: 13px;
       height: 13px;
@@ -331,7 +423,6 @@
       .server-strip { justify-content: flex-start; }
       .layout { grid-template-columns: 1fr; }
       #board { margin: 0 auto; }
-      .bottom { grid-template-columns: 1fr; }
     }
     @media (max-width: 620px) {
       .app { width: min(100vw - 14px, 1520px); padding-top: 10px; }
@@ -390,7 +481,10 @@
           <div class="section-title"><h2><span class="side-dot"></span>Brancas</h2><span id="whiteRole">Humano</span></div>
           <div class="grid">
             <div class="field"><label for="whitePlayer">Jogador</label><select id="whitePlayer"></select></div>
-            <div class="field"><label for="whiteSims">Sims</label><input id="whiteSims" type="number" min="1" max="1600" step="1" value="96"></div>
+            <div class="field range-field">
+              <div class="range-header"><label for="whiteSims">Sims</label><output id="whiteSimsValue">96</output></div>
+              <input id="whiteSims" type="range" min="1" max="1600" step="1" value="96">
+            </div>
           </div>
         </div>
 
@@ -398,7 +492,10 @@
           <div class="section-title"><h2><span class="side-dot black"></span>Pretas</h2><span id="blackRole">Modelo</span></div>
           <div class="grid">
             <div class="field"><label for="blackPlayer">Jogador</label><select id="blackPlayer"></select></div>
-            <div class="field"><label for="blackSims">Sims</label><input id="blackSims" type="number" min="1" max="1600" step="1" value="96"></div>
+            <div class="field range-field">
+              <div class="range-header"><label for="blackSims">Sims</label><output id="blackSimsValue">96</output></div>
+              <input id="blackSims" type="range" min="1" max="1600" step="1" value="96">
+            </div>
           </div>
         </div>
 
@@ -419,23 +516,6 @@
               </table>
             </div>
           </div>
-          <div class="section">
-            <div class="section-title"><h2>Conexao com backend</h2><button id="saveBackend" class="btn" type="button">Salvar</button></div>
-            <div class="connection-grid">
-              <div class="field">
-                <label for="backendUrl">URL do servidor Docker</label>
-                <div class="url-row">
-                  <input id="backendUrl" type="url" spellcheck="false">
-                  <button id="copyBackend" class="btn" type="button">Copiar</button>
-                </div>
-              </div>
-              <div class="match-state">
-                <div class="state-cell"><span>API</span><strong id="apiVersion">-</strong></div>
-                <div class="state-cell"><span>Modelos</span><strong id="modelCount">-</strong></div>
-              </div>
-              <div class="log" id="connLog"></div>
-            </div>
-          </div>
         </div>
       </aside>
     </section>
@@ -444,6 +524,8 @@
   <script>
     const FILES = "abcdefgh";
     const PIECES = {K:"&#9812;",Q:"&#9813;",R:"&#9814;",B:"&#9815;",N:"&#9816;",P:"&#9817;",k:"&#9818;",q:"&#9819;",r:"&#9820;",b:"&#9821;",n:"&#9822;",p:"&#9823;"};
+    const MIN_SIMS = 1;
+    const MAX_SIMS = 1600;
     const $ = (id) => document.getElementById(id);
     let ws = null;
     let state = null;
@@ -453,6 +535,7 @@
     let legalDests = [];
     let pieces = {};
     let flipped = false;
+    let activeBackend = defaultBackend();
 
     function defaultBackend() {
       const param = new URLSearchParams(location.search).get("backend");
@@ -464,7 +547,7 @@
     }
 
     function backendUrl() {
-      return $("backendUrl").value.trim().replace(/\/$/, "");
+      return activeBackend;
     }
 
     function wsUrl(path) {
@@ -586,7 +669,7 @@
       $("blackRole").textContent = playerLabel(state.players.black);
       renderHistory();
       if (state.lastInfo && state.lastInfo.model !== "human") {
-        $("connLog").textContent = `${state.lastInfo.label}: ${state.lastInfo.sims} sims em ${state.lastInfo.elapsedMs} ms (${state.lastInfo.device})`;
+        log(`${state.lastInfo.label}: ${state.lastInfo.sims} sims em ${state.lastInfo.elapsedMs} ms (${state.lastInfo.device})`);
       }
     }
 
@@ -685,11 +768,10 @@
         $("device").textContent = health.device || "-";
         $("uptime").textContent = `${health.uptimeSec || 0}s`;
         $("cache").textContent = `${(health.cache || []).length}/${(health.models || []).length}`;
-        $("apiVersion").textContent = health.version || "-";
         setServer(true, "online");
       } catch (err) {
         setServer(false, "offline");
-        $("connLog").textContent = `Health falhou: ${err.message}`;
+        log(`Health falhou: ${err.message}`, true);
       }
     }
 
@@ -698,7 +780,6 @@
       if (!res.ok) throw new Error(`models HTTP ${res.status}`);
       models = await res.json();
       modelById = Object.fromEntries(models.map(m => [m.id, m]));
-      $("modelCount").textContent = String(models.length);
       for (const id of ["whitePlayer", "blackPlayer"]) {
         const select = $(id);
         select.innerHTML = "";
@@ -715,9 +796,26 @@
       }
       $("whitePlayer").value = "human";
       $("blackPlayer").value = models[0]?.id || "human";
-      $("whiteSims").value = models[0]?.defaultSims || 96;
-      $("blackSims").value = models[0]?.defaultSims || 96;
+      setSims("whiteSims", models[0]?.defaultSims || 96);
+      setSims("blackSims", models[0]?.defaultSims || 96);
       updateDisabledSims();
+    }
+
+    function clampSims(value) {
+      return Math.max(MIN_SIMS, Math.min(MAX_SIMS, Number(value || 96)));
+    }
+
+    function setSims(id, value) {
+      const input = $(id);
+      input.min = String(MIN_SIMS);
+      input.max = String(MAX_SIMS);
+      input.value = String(clampSims(value));
+      updateSimsLabels();
+    }
+
+    function updateSimsLabels() {
+      $("whiteSimsValue").value = String(clampSims($("whiteSims").value));
+      $("blackSimsValue").value = String(clampSims($("blackSims").value));
     }
 
     function updateDisabledSims() {
@@ -725,10 +823,11 @@
       $("blackSims").disabled = $("blackPlayer").value === "human";
       $("whiteRole").textContent = playerLabel($("whitePlayer").value);
       $("blackRole").textContent = playerLabel($("blackPlayer").value);
+      updateSimsLabels();
     }
 
     async function reconnectAll() {
-      localStorage.setItem("azArenaBackend", backendUrl());
+      localStorage.setItem("azArenaBackend", activeBackend);
       try {
         await refreshHealth();
         await loadModels();
@@ -747,24 +846,20 @@
         cmd: "new",
         white: $("whitePlayer").value,
         black: $("blackPlayer").value,
-        whiteSims: Number($("whiteSims").value || 96),
-        blackSims: Number($("blackSims").value || 96)
+        whiteSims: clampSims($("whiteSims").value),
+        blackSims: clampSims($("blackSims").value)
       });
     }
 
-    $("backendUrl").value = defaultBackend();
-    $("saveBackend").onclick = reconnectAll;
     $("reconnect").onclick = reconnectAll;
-    $("copyBackend").onclick = async () => {
-      await navigator.clipboard.writeText(backendUrl());
-      $("connLog").textContent = "URL copiada.";
-    };
     $("newGame").onclick = newGame;
     $("stop").onclick = () => send({cmd:"stop"});
     $("flip").onclick = () => { flipped = !flipped; renderBoard(); };
     $("clearLog").onclick = () => log("");
     $("whitePlayer").onchange = updateDisabledSims;
     $("blackPlayer").onchange = updateDisabledSims;
+    $("whiteSims").oninput = updateSimsLabels;
+    $("blackSims").oninput = updateSimsLabels;
     $("presetHumanModel").onclick = () => {
       $("whitePlayer").value = "human";
       $("blackPlayer").value = models[0]?.id || "human";
